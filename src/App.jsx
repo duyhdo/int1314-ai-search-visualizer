@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useReducer, useRef } from 'react'
 import MazeGrid from './components/MazeGrid'
 import ControlPanel from './components/ControlPanel'
 import Animation from './components/Animation'
+import MazeGenerator from './components/MazeGenerator'
 import Statistics from './components/Statistics'
 import StatisticsComparison from './components/StatisticsComparison'
-import { sampleMaze } from './data/sampleMaze'
 import { validateInput, validateResult } from './utils/searchContract'
+import { generateMaze } from './utils/mazeGenerator'
+import { appStateReducer, createInitialAppState } from './utils/appState'
 import * as bfsModule from './algorithms/bfs'
 import * as dfsModule from './algorithms/dfs'
 import * as ucsModule from './algorithms/ucs'
@@ -15,19 +17,28 @@ import './styles/app.css'
 import './App.css'
 
 function App() {
-  const [maze] = useState(sampleMaze)
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState('')
-  const [resultRecord, setResultRecord] = useState(null)
-  const [comparisonResults, setComparisonResults] = useState([])
-  const [isRunning, setIsRunning] = useState(false)
-  const [error, setError] = useState(null)
+  const [state, dispatch] = useReducer(
+    appStateReducer,
+    undefined,
+    createInitialAppState,
+  )
+  const nextRequestIdRef = useRef(0)
+  const activeRequestRef = useRef(null)
+  const {
+    maze,
+    selectedAlgorithm,
+    resultRecord,
+    comparisonResults,
+    isRunning,
+    error,
+    mazeSize,
+    obstacleDensity,
+  } = state
 
   const currentResultRecord =
     resultRecord?.maze === maze ? resultRecord : null
   const currentResult = currentResultRecord?.result || null
-  const currentComparisonResults = comparisonResults.filter(
-    (entry) => entry.maze === maze,
-  )
+  const currentComparisonResults = comparisonResults.filter((entry) => entry.maze === maze)
 
   const algorithmMap = {
     bfs: bfsModule.breadthFirstSearch,
@@ -38,9 +49,15 @@ function App() {
   }
 
   const handleRunSearch = async () => {
-    setError(null)
-    setIsRunning(true)
-    setResultRecord(null)
+    if (activeRequestRef.current !== null) {
+      return
+    }
+
+    const requestId = nextRequestIdRef.current + 1
+    nextRequestIdRef.current = requestId
+    const request = { requestId, maze, algorithmId: selectedAlgorithm }
+    activeRequestRef.current = request
+    dispatch({ type: 'search-started', ...request })
 
     try {
       // Validate input
@@ -56,7 +73,11 @@ function App() {
 
       // Execute search
       const startTime = performance.now()
-      const searchResult = searchFn(maze)
+      const searchOutput = searchFn(maze)
+      const searchResult =
+        searchOutput && typeof searchOutput.then === 'function'
+          ? await searchOutput
+          : searchOutput
       const measuredExecutionTimeMs = performance.now() - startTime
 
       // Validate result
@@ -69,43 +90,48 @@ function App() {
         throw new Error(`Invalid result: ${resultValidation.error}`)
       }
 
-      setResultRecord({
-        maze,
-        algorithmId: selectedAlgorithm,
+      dispatch({
+        type: 'search-succeeded',
+        ...request,
         result: searchResult,
         executionTimeMs: measuredExecutionTimeMs,
       })
-      setComparisonResults((previousResults) => [
-        ...previousResults.filter(
-          (entry) =>
-            entry.algorithmId !== selectedAlgorithm || entry.maze !== maze,
-        ),
-        {
-          maze,
-          algorithmId: selectedAlgorithm,
-          result: searchResult,
-          executionTimeMs: measuredExecutionTimeMs,
-        },
-      ])
     } catch (err) {
       const errorMsg = err.message || 'An error occurred during search'
-      setError(errorMsg)
+      dispatch({ type: 'search-failed', ...request, error: errorMsg })
     } finally {
-      setIsRunning(false)
+      if (activeRequestRef.current?.requestId === requestId) {
+        activeRequestRef.current = null
+      }
+    }
+  }
+
+  const handleGenerateMaze = ({ size, density }) => {
+    activeRequestRef.current = null
+    try {
+      const generatedMaze = generateMaze({ size, density })
+      dispatch({
+        type: 'maze-generated',
+        maze: generatedMaze,
+        size,
+        density,
+      })
+    } catch (err) {
+      dispatch({
+        type: 'maze-generation-failed',
+        error: err.message || 'Unable to generate maze',
+      })
     }
   }
 
   const handleAlgorithmChange = (algorithmId) => {
-    setSelectedAlgorithm(algorithmId)
-    setResultRecord(null)
-    setError(null)
+    activeRequestRef.current = null
+    dispatch({ type: 'algorithm-selected', algorithmId })
   }
 
   const handleReset = () => {
-    setSelectedAlgorithm('')
-    setResultRecord(null)
-    setComparisonResults([])
-    setError(null)
+    activeRequestRef.current = null
+    dispatch({ type: 'reset' })
   }
 
   return (
@@ -132,6 +158,18 @@ function App() {
         </div>
 
         <div className="app-sidebar">
+          <MazeGenerator
+            onGenerate={handleGenerateMaze}
+            size={mazeSize}
+            density={obstacleDensity}
+            onSizeChange={(size) =>
+              dispatch({ type: 'maze-settings-changed', size })
+            }
+            onDensityChange={(density) =>
+              dispatch({ type: 'maze-settings-changed', density })
+            }
+          />
+
           <ControlPanel
             selectedAlgorithm={selectedAlgorithm}
             onAlgorithmChange={handleAlgorithmChange}
