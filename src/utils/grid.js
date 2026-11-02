@@ -23,9 +23,9 @@ export function createGrid(rows, cols, fillValue = 0) {
  */
 export function isValidPosition(row, col, grid) {
   if (!grid || !Array.isArray(grid) || grid.length === 0) {
-    return false
+    return false;
   }
-  return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length
+  return row >= 0 && row < grid.length && col >= 0 && col < grid[0].length;
 }
 
 /**
