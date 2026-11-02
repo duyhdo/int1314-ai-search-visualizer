@@ -36,10 +36,22 @@ function MazeGrid({ grid, start, goal, visited = [], path = [] }) {
 
   return (
     <div className="maze-grid-container">
-      <div className="maze-grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      <div
+        className="maze-grid"
+        role="grid"
+        aria-label="Maze grid"
+        style={{
+          gridTemplateColumns: `repeat(${cols}, var(--cell-size))`,
+        }}
+      >
         {grid.map((row, rowIdx) =>
           row.map((cell, colIdx) => (
-            <div key={`${rowIdx}-${colIdx}`} className={`maze-cell ${getCellClass(rowIdx, colIdx)}`}>
+            <div
+              key={`${rowIdx}-${colIdx}`}
+              className={`maze-cell ${getCellClass(rowIdx, colIdx)}`}
+              role="gridcell"
+              aria-label={`Row ${rowIdx + 1}, column ${colIdx + 1}`}
+            >
               <div className="cell-inner" />
             </div>
           ))
