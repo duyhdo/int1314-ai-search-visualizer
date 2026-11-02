@@ -1,228 +1,342 @@
 # AI Search Visualizer
 
-A React-based web application for visualizing and comparing five fundamental pathfinding algorithms on a 2D maze.
+**Ứng dụng mô phỏng và so sánh các thuật toán tìm kiếm trong không gian trạng thái**
 
-## Overview
+**Môn học:** Trí tuệ nhân tạo (INT1314)  
+**Loại đề tài:** Đồ án nhóm – 5 thành viên  
+**Hạn hoàn thành:** 06/11/2026  
+**Repository:** https://github.com/duyhdo/int1314-ai-search-visualizer
 
-This is an **educational project** for the university AI course (INT1314) where students implement and compare search algorithms:
+### Danh sách thành viên
 
-- **Breadth-First Search (BFS)** - Level-by-level exploration
-- **Depth-First Search (DFS)** - Deep-first exploration  
-- **Uniform Cost Search (UCS)** - Cost-based exploration
-- **Greedy Best-First Search** - Heuristic-guided exploration
-- **A* Search** - Optimal heuristic-guided exploration
+1. K24DTCN486 - Đỗ Hoàng Duy - dohoangduy.vig@gmail.com - duyhdo
+2. 
+3. 
+4. 
+5. 
 
-Each student implements one algorithm and one application feature.
+---
 
-## Quick Start
+## 1. Giới thiệu
 
-### Prerequisites
-- Node.js >= 18
-- npm >= 10
+AI Search Visualizer là ứng dụng Web mô phỏng các thuật toán tìm kiếm trong không gian trạng thái thông qua bài toán tìm đường đi trong mê cung hai chiều.
 
-### Installation
+Ứng dụng sử dụng 5 thuật toán:
+
+| STT | Thuật toán | Phương pháp tìm kiếm |
+|---|---|---|
+| 1 | Breadth-First Search (BFS) | Tìm kiếm theo chiều rộng |
+| 2 | Depth-First Search (DFS) | Tìm kiếm theo chiều sâu |
+| 3 | Uniform Cost Search (UCS) | Tìm kiếm theo chi phí |
+| 4 | Greedy Best-First Search | Tìm kiếm dựa trên heuristic |
+| 5 | A* Search | Tìm kiếm kết hợp chi phí và heuristic |
+
+Ứng dụng cho phép quan sát quá trình tìm kiếm, hiển thị đường đi từ điểm bắt đầu đến điểm đích và so sánh kết quả giữa các thuật toán.
+
+## 2. Chức năng ứng dụng
+
+- Hiển thị mê cung dạng lưới 2D.
+- Thiết lập điểm bắt đầu (S), điểm đích (G) và vật cản.
+- Lựa chọn thuật toán tìm kiếm.
+- Mô phỏng quá trình mở rộng các trạng thái.
+- Hiển thị đường đi tìm được.
+- Thống kê số bước, chi phí đường đi, số trạng thái mở rộng và thời gian thực thi.
+- So sánh kết quả giữa các thuật toán trên cùng một mê cung.
+- Khôi phục trạng thái ban đầu của mê cung.
+
+## 3. Công nghệ sử dụng
+
+| Thành phần | Công nghệ |
+|---|---|
+| Frontend | React, JavaScript |
+| Build Tool | Vite |
+| Giao diện | HTML, CSS |
+| Unit Test | Vitest |
+| Code Quality | ESLint |
+| Version Control | Git |
+| Repository | GitHub |
+| IDE | Visual Studio Code |
+
+Ứng dụng chạy trên trình duyệt, không sử dụng Backend hoặc Database.
+
+## 4. Cài đặt và chạy ứng dụng
+
+### 4.1. Yêu cầu môi trường
+
+- Node.js 20.19+ hoặc 22.12+ (khuyến nghị Node.js 24 LTS).
+- npm tương thích với phiên bản Node.js.
+- Git.
+
+### 4.2. Tải mã nguồn
+
+```bash
+git clone https://github.com/duyhdo/int1314-ai-search-visualizer.git
+cd int1314-ai-search-visualizer
+```
+
+Chuyển sang nhánh phát triển:
+
+```bash
+git switch develop
+git pull origin develop
+```
+
+### 4.3. Cài đặt thư viện
 
 ```bash
 npm install
 ```
 
-### Development
+### 4.4. Chạy ứng dụng
 
 ```bash
 npm run dev
 ```
 
-Opens the app at `http://localhost:5173` with hot-reload enabled.
+Truy cập địa chỉ được Vite hiển thị, mặc định:
 
-### Build
+http://localhost:5173/
+
+### 4.5. Build và kiểm thử
 
 ```bash
 npm run build
-```
-
-Creates an optimized production build in the `dist/` directory.
-
-### Testing
-
-```bash
+npm run lint
 npm test
 ```
 
-Runs unit tests for grid utilities and search contract validation.
+## 5. Cấu trúc mã nguồn
 
-### Linting
-
-```bash
-npm run lint
+```text
+int1314-ai-search-visualizer/
+├── .github/
+│   └── copilot-instructions.md
+├── docs/
+│   ├── ARCHITECTURE.md
+│   └── TASKS.md
+├── public/
+├── src/
+│   ├── algorithms/
+│   │   ├── bfs.js
+│   │   ├── dfs.js
+│   │   ├── ucs.js
+│   │   ├── greedy.js
+│   │   └── astar.js
+│   ├── components/
+│   │   ├── MazeGrid.jsx
+│   │   ├── ControlPanel.jsx
+│   │   ├── Animation.jsx
+│   │   └── Statistics.jsx
+│   ├── data/
+│   │   └── sampleMaze.js
+│   ├── utils/
+│   │   ├── grid.js
+│   │   └── searchContract.js
+│   ├── styles/
+│   │   └── app.css
+│   ├── tests/
+│   │   ├── grid.test.js
+│   │   └── searchContract.test.js
+│   ├── App.jsx
+│   └── main.jsx
+├── CONTRIBUTING.md
+├── README.md
+├── package.json
+├── vite.config.js
+└── vitest.config.js
 ```
 
-Checks code quality and consistency.
+## 6. Quy ước dữ liệu
 
-## Project Structure
+Các thuật toán sử dụng chung cấu trúc đầu vào và đầu ra.
 
-```
-src/
-├── algorithms/          # Algorithm stub modules (students implement these)
-│   ├── bfs.js
-│   ├── dfs.js
-│   ├── ucs.js
-│   ├── greedy.js
-│   └── astar.js
-├── components/          # React UI components
-│   ├── MazeGrid.jsx     # Grid visualization
-│   ├── ControlPanel.jsx # Algorithm selection and controls
-│   ├── Animation.jsx    # Placeholder for step-by-step visualization
-│   └── Statistics.jsx   # Search result statistics
-├── data/                # Sample maze data
-│   └── sampleMaze.js
-├── utils/               # Shared utilities
-│   ├── grid.js          # Grid manipulation functions
-│   └── searchContract.js # Algorithm interface and validation
-├── styles/              # CSS styles
-│   └── app.css
-├── tests/               # Unit tests
-│   ├── grid.test.js
-│   └── searchContract.test.js
-└── App.jsx              # Main app component
-```
+### 6.1. Dữ liệu đầu vào
 
-## Shared Data Model
-
-All algorithms follow the same input/output contract:
-
-### Input
 ```javascript
 {
-  grid: Array<Array<number>>,     // 2D grid (0=walkable, 1=blocked)
-  start: {row: number, col: number},
-  goal: {row: number, col: number}
+  grid: Array<Array<number>>,
+  start: { row: number, col: number },
+  goal: { row: number, col: number }
 }
 ```
 
-### Output (Result)
+Quy ước:
+
+- `grid`: Ma trận hai chiều.
+- `0`: Ô có thể di chuyển.
+- `1`: Vật cản.
+- `start`: Vị trí bắt đầu.
+- `goal`: Vị trí đích.
+- Di chuyển theo bốn hướng: Lên, Phải, Xuống, Trái.
+- Chi phí mỗi bước di chuyển bằng 1.
+
+### 6.2. Dữ liệu đầu ra
+
 ```javascript
 {
-  found: boolean,                   // Whether a path exists
-  path: Array<{row, col}>,         // Path from start to goal (including both)
-  visitedOrder: Array<{row, col}>, // Nodes expanded in order (no duplicates)
-  pathCost: number | null,         // Cost of the path (null if not found)
-  expandedNodes: number             // Total nodes expanded
+  found: boolean,
+  path: Array<{ row, col }>,
+  visitedOrder: Array<{ row, col }>,
+  pathCost: number | null,
+  expandedNodes: number
 }
 ```
 
-### Contract Rules
-- **Successful path**: `found=true`, path includes start and goal, `pathCost` is number
-- **No solution**: `found=false`, `path=[]`, `pathCost=null`
-- **Deterministic**: Same input always produces same output
-- **No mutations**: Input parameters must not be modified
-- **4-directional movement**: Up, Right, Down, Left (in that order)
-- **Unit cost**: Default move cost is 1
-- **No duplicates**: `visitedOrder` lists each expanded node exactly once
-- **Valid expansion count**: `expandedNodes === visitedOrder.length`
+| Thuộc tính | Ý nghĩa |
+|---|---|
+| `found` | Kết quả tìm kiếm |
+| `path` | Đường đi từ S đến G |
+| `visitedOrder` | Thứ tự các trạng thái được mở rộng |
+| `pathCost` | Tổng chi phí đường đi |
+| `expandedNodes` | Số trạng thái được mở rộng |
 
-## Student Responsibilities
+Các thuật toán phải tuân thủ cấu trúc dữ liệu chung, không thay đổi dữ liệu đầu vào và không ghi trùng trạng thái trong `visitedOrder`.
 
-| Student | Algorithm | Feature |
-|---------|-----------|---------|
-| 1 | BFS | Grid utilities (grid.js helpers) |
-| 2 | DFS | Maze editing UI |
-| 3 | UCS | Search animation / step visualization |
-| 4 | Greedy | Statistics & comparison view |
-| 5 | A* | Controls integration & final polish |
+## 7. Phân công công việc
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs/TASKS.md](./docs/TASKS.md) for detailed assignments.
+Mỗi thành viên phụ trách một thuật toán và một chức năng của ứng dụng.
 
-## Development Workflow
+| Thành viên | Thuật toán | Chức năng | Branch |
+|---|---|---|---|
+| Thành viên 1 | BFS | Grid Utilities | `feature/bfs-grid` |
+| Thành viên 2 | DFS | Maze Editor | `feature/dfs-maze-ui` |
+| Thành viên 3 | UCS | Animation | `feature/ucs-animation` |
+| Thành viên 4 | Greedy | Statistics & Comparison | `feature/greedy-statistics` |
+| Thành viên 5 | A* | Controls & Integration | `feature/astar-controls` |
 
-### Branch Naming
+Mỗi thành viên thực hiện lập trình, kiểm thử và commit mã nguồn trên branch được phân công.
+
+Chi tiết công việc: [docs/TASKS.md](./docs/TASKS.md).
+
+## 8. Quy trình Git
+
+### 8.1. Cấu trúc Branch
+
+```text
+main
+ └── develop
+      ├── feature/bfs-grid
+      ├── feature/dfs-maze-ui
+      ├── feature/ucs-animation
+      ├── feature/greedy-statistics
+      └── feature/astar-controls
 ```
-  develop
-  main
-  feature/bfs-grid
-  feature/dfs-maze-ui
-  feature/ucs-animation
-  feature/greedy-statistics
-  feature/astar-controls
-  bugfix/description
-```
 
-### Pull Requests
-1. Create a feature branch
-2. Implement your algorithm or feature
-3. Write tests
-4. Ensure `npm run build`, `npm run lint`, and `npm test` pass
-5. Open a PR with a clear description
-6. Request review from other students
-7. Merge after approval
+- `main`: Nhánh chính, lưu phiên bản ổn định.
+- `develop`: Nhánh tích hợp các chức năng.
+- `feature/*`: Nhánh lập trình của từng thành viên.
 
-### Code Quality
-- Follow ESLint rules (run `npm run lint`)
-- Write unit tests for new utility functions
-- Keep components focused and reusable
-- Add JSDoc comments to public functions
+### 8.2. Làm việc trên Branch
 
-## Testing
+Ví dụ thành viên 1:
 
-Unit tests cover:
-- Grid utilities (createGrid, getNeighbors, etc.)
-- Search contract validation (input/output)
-- Algorithm interface expectations
-
-Run tests:
 ```bash
-npm test              # Single run
-npm test -- --watch  # Watch mode
+git fetch origin
+git switch feature/bfs-grid
+git pull origin feature/bfs-grid
 ```
 
-## Deployment
+Sau khi hoàn thành:
 
-The app is ready to deploy to static hosting (Netlify, Vercel, GitHub Pages):
+```bash
+git add .
+git commit -m "feat(bfs): implement breadth-first search"
+git push -u origin feature/bfs-grid
+```
+
+### 8.3. Pull Request
+
+1. Hoàn thành code và Unit Test trên branch được phân công.
+2. Chạy `npm run build`, `npm run lint` và `npm test`.
+3. Push source code lên GitHub.
+4. Tạo Pull Request vào `develop`.
+5. Review, sửa lỗi và merge sau khi được chấp thuận.
+
+Không push trực tiếp vào `main` hoặc `develop`.
+
+## 9. Kiểm thử
+
+### 9.1. Unit Test
+
+Kiểm thử các thành phần:
+
+- Grid Utilities.
+- Search Contract.
+- Thuật toán BFS, DFS, UCS, Greedy và A*.
+- Các trường hợp có đường đi, không có đường đi và điểm bắt đầu trùng điểm đích.
+
+### 9.2. Integration Test
+
+- Thuật toán nhận đúng dữ liệu mê cung.
+- Giao diện gọi đúng thuật toán được chọn.
+- Animation hiển thị đúng thứ tự mở rộng trạng thái.
+- Statistics hiển thị đúng kết quả.
+- Reset khôi phục trạng thái ban đầu.
+
+Lệnh kiểm thử:
 
 ```bash
 npm run build
-# Deploy the dist/ folder
+npm run lint
+npm test
 ```
 
-## Documentation
+## 10. Triển khai ứng dụng
 
-- [README.md](./README.md) - This file
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - Development guidelines
-- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) - System design
-- [docs/TASKS.md](./docs/TASKS.md) - Student assignments
-- [.github/copilot-instructions.md](./.github/copilot-instructions.md) - AI-assisted development tips
+Ứng dụng có thể triển khai trên GitHub Pages, Vercel hoặc Netlify.
 
-## Dependencies
+Build phiên bản Production:
 
-- **React 19** - UI framework
-- **Vite 8** - Build tool
-- **Vitest 1** - Testing framework
-- **ESLint 10** - Linting
+```bash
+npm run build
+```
 
-No third-party pathfinding libraries are used intentionally—students implement algorithms from scratch.
+Thư mục `dist/` chứa các file dùng để triển khai ứng dụng.
 
-## Troubleshooting
+## 11. Tài liệu dự án
 
-### Port already in use
+- [CONTRIBUTING.md](./CONTRIBUTING.md) – Hướng dẫn làm việc nhóm.
+- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) – Thiết kế và cấu trúc hệ thống.
+- [docs/TASKS.md](./docs/TASKS.md) – Phân công công việc.
+- [.github/copilot-instructions.md](./.github/copilot-instructions.md) – Hướng dẫn phát triển với GitHub Copilot.
+
+## 12. Xử lý lỗi thường gặp
+
+**Cổng localhost đang được sử dụng:**
+
 ```bash
 npm run dev -- --port 3000
 ```
 
-### Build fails
+**Lỗi cài đặt thư viện:**
+
 ```bash
 npm install
+```
+
+**Lỗi Build:**
+
+```bash
 npm run build
 ```
 
-### Tests fail
-Ensure all utility functions are working correctly:
+**Lỗi Unit Test:**
+
 ```bash
 npm test -- --reporter=verbose
 ```
 
-## Deadline
+**Kiểm tra Branch:**
 
-**November 6, 2026** - All algorithms and features must be complete and tested.
+```bash
+git fetch origin
+git branch -a
+```
 
-## License
+## 13. Phạm vi sử dụng
 
-Educational use only. Part of INT1314 AI Course Project.
+Dự án được thực hiện phục vụ học tập và báo cáo đồ án môn Trí tuệ nhân tạo (INT1314).
+
+Mã nguồn được quản lý trên GitHub và phát triển theo phân công của nhóm.
+
+**Hạn hoàn thành: 06/11/2026.**
