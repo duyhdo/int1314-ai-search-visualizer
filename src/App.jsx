@@ -3,8 +3,9 @@ import MazeGrid from './components/MazeGrid'
 import ControlPanel from './components/ControlPanel'
 import Animation from './components/Animation'
 import Statistics from './components/Statistics'
+import StatisticsComparison from './components/StatisticsComparison'
 import { sampleMaze } from './data/sampleMaze'
-import { validateInput, createEmptyResult } from './utils/searchContract'
+import { validateInput, validateResult } from './utils/searchContract'
 import * as bfsModule from './algorithms/bfs'
 import * as dfsModule from './algorithms/dfs'
 import * as ucsModule from './algorithms/ucs'
@@ -16,9 +17,17 @@ import './App.css'
 function App() {
   const [maze] = useState(sampleMaze)
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('')
-  const [result, setResult] = useState(null)
+  const [resultRecord, setResultRecord] = useState(null)
+  const [comparisonResults, setComparisonResults] = useState([])
   const [isRunning, setIsRunning] = useState(false)
   const [error, setError] = useState(null)
+
+  const currentResultRecord =
+    resultRecord?.maze === maze ? resultRecord : null
+  const currentResult = currentResultRecord?.result || null
+  const currentComparisonResults = comparisonResults.filter(
+    (entry) => entry.maze === maze,
+  )
 
   const algorithmMap = {
     bfs: bfsModule.breadthFirstSearch,
@@ -31,6 +40,7 @@ function App() {
   const handleRunSearch = async () => {
     setError(null)
     setIsRunning(true)
+    setResultRecord(null)
 
     try {
       // Validate input
@@ -45,26 +55,56 @@ function App() {
       }
 
       // Execute search
+      const startTime = performance.now()
       const searchResult = searchFn(maze)
+      const measuredExecutionTimeMs = performance.now() - startTime
 
       // Validate result
       if (!searchResult) {
         throw new Error('Algorithm returned no result')
       }
 
-      setResult(searchResult)
+      const resultValidation = validateResult(searchResult)
+      if (!resultValidation.valid) {
+        throw new Error(`Invalid result: ${resultValidation.error}`)
+      }
+
+      setResultRecord({
+        maze,
+        algorithmId: selectedAlgorithm,
+        result: searchResult,
+        executionTimeMs: measuredExecutionTimeMs,
+      })
+      setComparisonResults((previousResults) => [
+        ...previousResults.filter(
+          (entry) =>
+            entry.algorithmId !== selectedAlgorithm || entry.maze !== maze,
+        ),
+        {
+          maze,
+          algorithmId: selectedAlgorithm,
+          result: searchResult,
+          executionTimeMs: measuredExecutionTimeMs,
+        },
+      ])
     } catch (err) {
       const errorMsg = err.message || 'An error occurred during search'
       setError(errorMsg)
-      setResult(createEmptyResult())
     } finally {
       setIsRunning(false)
     }
   }
 
+  const handleAlgorithmChange = (algorithmId) => {
+    setSelectedAlgorithm(algorithmId)
+    setResultRecord(null)
+    setError(null)
+  }
+
   const handleReset = () => {
     setSelectedAlgorithm('')
-    setResult(null)
+    setResultRecord(null)
+    setComparisonResults([])
     setError(null)
   }
 
@@ -83,25 +123,29 @@ function App() {
               grid={maze.grid}
               start={maze.start}
               goal={maze.goal}
-              visited={result?.visitedOrder || []}
-              path={result?.path || []}
+              visited={currentResult?.visitedOrder || []}
+              path={currentResult?.path || []}
             />
           </div>
 
-          <Animation result={result} />
+          <Animation result={currentResult} />
         </div>
 
         <div className="app-sidebar">
           <ControlPanel
             selectedAlgorithm={selectedAlgorithm}
-            onAlgorithmChange={setSelectedAlgorithm}
+            onAlgorithmChange={handleAlgorithmChange}
             onRun={handleRunSearch}
             onReset={handleReset}
             isRunning={isRunning}
-            hasResult={result !== null}
+            hasResult={currentResult !== null}
           />
 
-          <Statistics result={result} algorithmId={selectedAlgorithm} />
+          <Statistics
+            result={currentResult}
+            algorithmId={selectedAlgorithm}
+            executionTimeMs={currentResultRecord?.executionTimeMs}
+          />
 
           {error && (
             <div className="panel">
@@ -110,6 +154,8 @@ function App() {
             </div>
           )}
         </div>
+
+        <StatisticsComparison results={currentComparisonResults} />
       </div>
     </>
   )
