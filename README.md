@@ -136,9 +136,14 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) and [docs/TASKS.md](./docs/TASKS.md) fo
 
 ### Branch Naming
 ```
-feature/student-N-algorithm-name
-feature/student-N-feature-name
-bugfix/description
+  develop
+  main
+  feature/bfs-grid
+  feature/dfs-maze-ui
+  feature/ucs-animation
+  feature/greedy-statistics
+  feature/astar-controls
+  bugfix/description
 ```
 
 ### Pull Requests
