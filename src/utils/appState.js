@@ -122,6 +122,8 @@ export function appStateReducer(state, action) {
         error: action.error,
         activeSearch: null,
       }
+    case 'error-dismissed':
+      return state.error === null ? state : { ...state, error: null }
     case 'reset':
       return {
         ...state,

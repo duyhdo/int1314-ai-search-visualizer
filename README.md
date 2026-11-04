@@ -43,6 +43,18 @@ AI Search Visualizer là ứng dụng Web mô phỏng các thuật toán tìm ki
 - Thống kê số bước, chi phí đường đi, số trạng thái mở rộng và thời gian thực thi.
 - So sánh kết quả giữa các thuật toán trên cùng một mê cung.
 - Khôi phục trạng thái ban đầu của mê cung.
+- Điều khiển nhanh bằng bàn phím.
+
+### Phím tắt
+
+| Phím | Chức năng |
+|---|---|
+| `Enter` / `Space` | Chạy thuật toán đang chọn |
+| `R` | Reset kết quả |
+| `1` – `5` | Chọn thuật toán (1 = BFS, 2 = DFS, 3 = UCS, 4 = Greedy, 5 = A*) |
+| `Esc` | Đóng thông báo lỗi |
+
+Phím tắt không hoạt động khi đang nhập liệu trong ô `input`/`select` (trừ `Esc`). Danh sách phím tắt cũng được hiển thị trong mục *Keyboard shortcuts* của bảng Search Control.
 
 ## 3. Công nghệ sử dụng
 
@@ -131,6 +143,7 @@ int1314-ai-search-visualizer/
 │   │   └── sampleMaze.js
 │   ├── utils/
 │   │   ├── grid.js
+│   │   ├── keyboard.js
 │   │   └── searchContract.js
 │   ├── styles/
 │   │   └── app.css
