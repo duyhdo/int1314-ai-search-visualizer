@@ -281,6 +281,18 @@ npm run lint
 npm test
 ```
 
+### 9.3. BFS và Grid Utilities
+
+BFS đã được triển khai tại `src/algorithms/bfs.js`: dùng hàng đợi FIFO, đánh dấu khi thêm vào hàng đợi để tránh trùng và dựng đường đi bằng con trỏ cha. Thứ tự duyệt hàng xóm là Lên → Phải → Xuống → Trái; `visitedOrder` ghi lúc lấy ô ra khỏi hàng đợi, gồm cả đích khi tìm thấy. Thuật toán không thay đổi đầu vào.
+
+Kết quả tuân thủ `src/utils/searchContract.js`: đường đi gồm cả S/G, chi phí bằng số bước; khi không có đường đi thì `path=[]`, `pathCost=null`. Đầu vào không hợp lệ gây lỗi. Thời gian và bộ nhớ trên lưới hữu hạn đều là `O(rows × cols)`.
+
+Các tiện ích lưới kiểm tra tọa độ nguyên, chỉ cho đi qua ô bằng số `0` và mã hóa tọa độ theo dạng `"row,col"`. Bộ kiểm thử bổ sung bao gồm góc/cạnh, vật cản, tọa độ sai, thứ tự duyệt và đối chiếu đường đi ngắn nhất trên toàn bộ 128 cách đặt vật cản của lưới 3×3 với S/G cố định.
+
+```bash
+npm test -- --run grid.test.js bfs.test.js
+```
+
 ## 10. Triển khai ứng dụng
 
 Ứng dụng có thể triển khai trên GitHub Pages, Vercel hoặc Netlify.
