@@ -1,6 +1,16 @@
 import './MazeGrid.css'
 
-function MazeGrid({ grid, start, goal, visited = [], path = [], isEditing = false, onCellClick }) {
+function MazeGrid({
+  grid,
+  start,
+  goal,
+  visited = [],
+  path = [],
+  current = null,
+  frontier = [],
+  isEditing = false,
+  onCellClick,
+}) {
   if (!grid || grid.length === 0) {
     return <div className="maze-grid-error">Grid data not available</div>
   }
@@ -8,6 +18,8 @@ function MazeGrid({ grid, start, goal, visited = [], path = [], isEditing = fals
   const cols = grid[0].length
   const visitedSet = new Set(visited.map((p) => `${p.row},${p.col}`))
   const pathSet = new Set(path.map((p) => `${p.row},${p.col}`))
+  const frontierSet = new Set(frontier.map((p) => `${p.row},${p.col}`))
+  const currentKey = current ? `${current.row},${current.col}` : null
 
   const getCellClass = (row, col) => {
     const cellKey = `${row},${col}`
@@ -16,7 +28,9 @@ function MazeGrid({ grid, start, goal, visited = [], path = [], isEditing = fals
     if (row === goal.row && col === goal.col) return 'cell-goal'
     if (grid[row][col] === 1) return 'cell-obstacle'
     if (pathSet.has(cellKey)) return 'cell-path'
+    if (cellKey === currentKey) return 'cell-current'
     if (visitedSet.has(cellKey)) return 'cell-visited'
+    if (frontierSet.has(cellKey)) return 'cell-frontier'
 
     return 'cell-empty'
   }
@@ -47,6 +61,14 @@ function MazeGrid({ grid, start, goal, visited = [], path = [], isEditing = fals
         <div className="legend-item">
           <div className="legend-color cell-obstacle"><div className="cell-inner" /></div>
           <span>Obstacle</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color cell-current"><div className="cell-inner" /></div>
+          <span>Current</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color cell-frontier"><div className="cell-inner" /></div>
+          <span>Frontier</span>
         </div>
         <div className="legend-item">
           <div className="legend-color cell-visited"><div className="cell-inner" /></div>
