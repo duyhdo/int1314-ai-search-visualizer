@@ -53,3 +53,36 @@
   margin: 0;
   color: var(--text-primary) !important;
 }
+.anim-counter {
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+}
+
+.anim-progress {
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.anim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.anim-controls .button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.anim-speed {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.anim-speed input {
+  flex: 1;
+}

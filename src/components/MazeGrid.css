@@ -154,3 +154,12 @@
     gap: var(--spacing-md);
   }
 }
+.cell-current,
+.cell-current .cell-inner {
+  background: #8b5cf6;
+}
+
+.cell-frontier,
+.cell-frontier .cell-inner {
+  background: #bfdbfe;
+}

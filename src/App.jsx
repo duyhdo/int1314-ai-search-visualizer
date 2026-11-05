@@ -26,6 +26,7 @@ function App() {
     createInitialAppState,
   )
   const [isEditing, setIsEditing] = useState(false)
+  const [animationFrame, setAnimationFrame] = useState(null)
   const nextRequestIdRef = useRef(0)
   const activeRequestRef = useRef(null)
   const {
@@ -43,7 +44,8 @@ function App() {
     resultRecord?.maze === maze ? resultRecord : null
   const currentResult = currentResultRecord?.result || null
   const currentComparisonResults = comparisonResults.filter((entry) => entry.maze === maze)
-  const errorHint = error ? getErrorHint(error) : null
+  const frame =
+  animationFrame && animationFrame.result === currentResult ? animationFrame : null
 
   const algorithmMap = {
     bfs: bfsModule.breadthFirstSearch,
@@ -202,12 +204,15 @@ function App() {
               grid={maze.grid}
               start={maze.start}
               goal={maze.goal}
-              visited={currentResult?.visitedOrder || []}
-              path={currentResult?.path || []}
+              visited={frame ? frame.visited : currentResult?.visitedOrder || []}
+              path={frame ? frame.path : currentResult?.path || []}
+              current={frame?.current || null}
+              frontier={frame?.frontier || []}
+             
             />
           </div>
 
-          <Animation result={currentResult} />
+         <Animation result={currentResult} maze={maze} onFrameChange={setAnimationFrame} />
         </div>
 
         <div className="app-sidebar">
