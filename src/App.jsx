@@ -44,6 +44,7 @@ function App() {
     resultRecord?.maze === maze ? resultRecord : null
   const currentResult = currentResultRecord?.result || null
   const currentComparisonResults = comparisonResults.filter((entry) => entry.maze === maze)
+  const errorHint = error ? getErrorHint(error) : null
   const frame =
   animationFrame && animationFrame.result === currentResult ? animationFrame : null
 
