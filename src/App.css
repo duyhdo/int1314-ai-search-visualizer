@@ -1,1 +1,40 @@
 /* App-specific overrides if needed */
+
+.error-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-panel-header h2 {
+  margin-bottom: 0;
+}
+
+.error-close {
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.error-close:hover {
+  color: var(--warning-color);
+}
+
+.error-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 480px) {
+  .app-header p {
+    font-size: 13px;
+  }
+
+  .app-container {
+    padding: var(--spacing-sm);
+  }
+}

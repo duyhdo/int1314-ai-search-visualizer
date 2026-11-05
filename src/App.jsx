@@ -1,4 +1,4 @@
-import { useReducer, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import MazeGrid from './components/MazeGrid'
 import MazeEditor from './components/MazeEditor'
 import { sampleMaze } from './data/sampleMaze'
@@ -10,6 +10,7 @@ import StatisticsComparison from './components/StatisticsComparison'
 import { validateInput, validateResult } from './utils/searchContract'
 import { generateMaze } from './utils/mazeGenerator'
 import { appStateReducer, createInitialAppState } from './utils/appState'
+import { getShortcutAction } from './utils/keyboard'
 import * as bfsModule from './algorithms/bfs'
 import * as dfsModule from './algorithms/dfs'
 import * as ucsModule from './algorithms/ucs'
@@ -42,6 +43,7 @@ function App() {
     resultRecord?.maze === maze ? resultRecord : null
   const currentResult = currentResultRecord?.result || null
   const currentComparisonResults = comparisonResults.filter((entry) => entry.maze === maze)
+  const errorHint = error ? getErrorHint(error) : null
 
   const algorithmMap = {
     bfs: bfsModule.breadthFirstSearch,
@@ -155,6 +157,32 @@ function App() {
     dispatch({ type: 'reset' })
   }
 
+  // re-attached every render so the handler always sees the latest state
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      const action = getShortcutAction(event)
+      if (!action) return
+
+      if (action.type === 'dismiss-error') {
+        if (error) dispatch({ type: 'error-dismissed' })
+        return
+      }
+      if (isRunning) return
+
+      if (action.type === 'run') {
+        event.preventDefault()
+        if (selectedAlgorithm) handleRunSearch()
+      } else if (action.type === 'reset') {
+        handleReset()
+      } else if (action.type === 'select') {
+        handleAlgorithmChange(action.algorithmId)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   return (
     <>
       <header className="app-header">
@@ -202,6 +230,7 @@ function App() {
             onReset={handleReset}
             isRunning={isRunning}
             hasResult={currentResult !== null}
+            resultFound={currentResult?.found}
           />
 
           <Statistics
@@ -211,9 +240,21 @@ function App() {
           />
 
           {error && (
-            <div className="panel">
-              <h2>Error</h2>
+            <div className="panel error-panel" role="alert">
+              <div className="error-panel-header">
+                <h2>Error</h2>
+                <button
+                  type="button"
+                  className="error-close"
+                  onClick={() => dispatch({ type: 'error-dismissed' })}
+                  title="Close (Esc)"
+                  aria-label="Close error"
+                >
+                  ×
+                </button>
+              </div>
               <div className="error-message">{error}</div>
+              {errorHint && <p className="error-hint">{errorHint}</p>}
             </div>
           )}
         </div>
@@ -222,6 +263,19 @@ function App() {
       </div>
     </>
   )
+}
+
+function getErrorHint(message) {
+  if (/not implemented/i.test(message)) {
+    return 'This algorithm has not been merged yet. Try another one (keys 1-5).'
+  }
+  if (/walkable/i.test(message)) {
+    return 'Start or goal is on a wall. Generate a new maze and try again.'
+  }
+  if (/Invalid result/.test(message)) {
+    return 'The algorithm returned data that breaks the search contract. Check its unit tests.'
+  }
+  return null
 }
 
 export default App

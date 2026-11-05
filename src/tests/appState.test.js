@@ -258,3 +258,19 @@ describe('maze-aware app state', () => {
   })
 
 })
+
+describe('error-dismissed', () => {
+  it('clears the error and keeps everything else', () => {
+    const state = { ...createInitialAppState(), error: 'boom', selectedAlgorithm: 'astar' }
+    const next = appStateReducer(state, { type: 'error-dismissed' })
+
+    expect(next.error).toBeNull()
+    expect(next.selectedAlgorithm).toBe('astar')
+    expect(next.maze).toBe(state.maze)
+  })
+
+  it('returns the same state if there is no error', () => {
+    const state = createInitialAppState()
+    expect(appStateReducer(state, { type: 'error-dismissed' })).toBe(state)
+  })
+})
