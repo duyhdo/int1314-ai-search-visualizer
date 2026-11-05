@@ -201,3 +201,125 @@ describe("Grid Utilities", () => {
     });
   });
 });
+
+describe("Grid utility edge cases", () => {
+  it("allows zero dimensions", () => {
+    expect(createGrid(0, 3)).toEqual([]);
+    expect(createGrid(2, 0)).toEqual([[], []]);
+  });
+
+  it.each([
+    [-1, 2],
+    [2, -1],
+    [1.5, 2],
+    [2, 1.5],
+    [NaN, 2],
+    [2, Infinity],
+    ["2", 2],
+  ])("rejects invalid dimensions %s by %s", (rows, cols) => {
+    expect(() => createGrid(rows, cols)).toThrow(RangeError);
+  });
+
+  it("rejects fractional and coerced coordinates", () => {
+    const grid = createGrid(2, 3);
+    for (const [row, col] of [[0.5, 0], [0, 0.5], ["0", 1], [0, "1"], [NaN, 0]]) {
+      expect(isValidPosition(row, col, grid)).toBe(false);
+      expect(isWalkable(row, col, grid)).toBe(false);
+    }
+    expect(isValidPosition(1, 2, grid)).toBe(true);
+  });
+
+  it("checks the actual row in empty, ragged, and malformed grids", () => {
+    const grid = [[0], [0, 0], [], null];
+    expect(isValidPosition(1, 1, grid)).toBe(true);
+    expect(isValidPosition(0, 1, grid)).toBe(false);
+    expect(isValidPosition(2, 0, grid)).toBe(false);
+    expect(isValidPosition(3, 0, grid)).toBe(false);
+    expect(isValidPosition(0, 0, [])).toBe(false);
+    expect(isValidPosition(0, 0, {})).toBe(false);
+    expect(isWalkable(3, 0, grid)).toBe(false);
+  });
+
+  it("treats only numeric zero as walkable", () => {
+    const grid = [[0, "0", false, null, undefined, 2]];
+    expect(isWalkable(0, 0, grid)).toBe(true);
+    for (let col = 1; col < grid[0].length; col += 1) {
+      expect(isWalkable(0, col, grid)).toBe(false);
+    }
+  });
+
+  it("preserves direction order at corners, edges, and around obstacles", () => {
+    const grid = createGrid(3, 3);
+    expect(getNeighbors(0, 0, grid)).toEqual([
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+    ]);
+    expect(getNeighbors(0, 1, grid)).toEqual([
+      { row: 0, col: 2 },
+      { row: 1, col: 1 },
+      { row: 0, col: 0 },
+    ]);
+    grid[0][1] = 1;
+    grid[2][1] = 1;
+    expect(getNeighbors(1, 1, grid)).toEqual([
+      { row: 1, col: 2 },
+      { row: 1, col: 0 },
+    ]);
+  });
+
+  it("returns no neighbors for invalid origins even beside a walkable cell", () => {
+    expect(getNeighbors(-1, 0, [[0]])).toEqual([]);
+    expect(getNeighbors(0, 1, [[0]])).toEqual([]);
+    expect(getNeighbors(0.5, 0, createGrid(2, 2))).toEqual([]);
+    expect(getNeighbors(0, 0, null)).toEqual([]);
+  });
+
+  it("handles isolated cells and ragged-grid neighbors", () => {
+    expect(getNeighbors(0, 0, [[0]])).toEqual([]);
+    expect(getNeighbors(1, 1, [[0], [0, 0]])).toEqual([{ row: 1, col: 0 }]);
+    expect(getNeighbors(0, 1, [[0, 0], [0]])).toEqual([{ row: 0, col: 0 }]);
+  });
+
+  it("supports negative coordinates in distance and serialization helpers", () => {
+    const from = { row: -2, col: 3 };
+    const to = { row: 1, col: -1 };
+    expect(manhattanDistance(from, to)).toBe(7);
+    expect(positionToKey(from)).toBe("-2,3");
+    expect(keyToPosition(positionToKey(from))).toEqual(from);
+  });
+
+  it("compares malformed positions safely and rejects them in distance helpers", () => {
+    expect(positionsEqual(null, { row: 0, col: 0 })).toBe(false);
+    expect(positionsEqual({}, {})).toBe(false);
+    expect(positionsEqual({ row: "1", col: 2 }, { row: 1, col: 2 })).toBe(false);
+    expect(() => manhattanDistance(null, { row: 0, col: 0 })).toThrow(TypeError);
+    expect(() => manhattanDistance({ row: 0, col: 0 }, { row: 0.5, col: 1 })).toThrow(TypeError);
+  });
+
+  it.each([
+    "",
+    "1",
+    "1,2,3",
+    "1.5,2",
+    "1, 2",
+    "x,2",
+    "1e2,0",
+    "1,2\n",
+    "1,2\r",
+    "9007199254740992,0",
+    null,
+  ])("rejects malformed or unsafe keys: %s", (key) => {
+    expect(() => keyToPosition(key)).toThrow(TypeError);
+  });
+
+  it.each([
+    null,
+    {},
+    { row: 1.5, col: 2 },
+    { row: "1", col: 2 },
+    { row: Infinity, col: 0 },
+    { row: Number.MAX_SAFE_INTEGER + 1, col: 0 },
+  ])("rejects invalid positions during serialization: %o", (position) => {
+    expect(() => positionToKey(position)).toThrow(TypeError);
+  });
+});

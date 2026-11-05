@@ -1,26 +1,25 @@
 import './MazeGrid.css'
 
-/**
- * MazeGrid Component
- * Displays the grid, obstacles, start position, and goal position
- * 
- * @param {Object} props
- * @param {Array<Array<number>>} props.grid - 2D grid (0=walkable, 1=obstacle)
- * @param {Object} props.start - Start position {row, col}
- * @param {Object} props.goal - Goal position {row, col}
- * @param {Array<{row, col}>} [props.visited] - Cells visited during search (optional)
- * @param {Array<{row, col}>} [props.path] - Final path from start to goal (optional)
- */
-function MazeGrid({ grid, start, goal, visited = [], path = [] }) {
+function MazeGrid({
+  grid,
+  start,
+  goal,
+  visited = [],
+  path = [],
+  current = null,
+  frontier = [],
+  isEditing = false,
+  onCellClick,
+}) {
   if (!grid || grid.length === 0) {
     return <div className="maze-grid-error">Grid data not available</div>
   }
 
   const cols = grid[0].length
-
-  // Create sets for quick lookup
   const visitedSet = new Set(visited.map((p) => `${p.row},${p.col}`))
   const pathSet = new Set(path.map((p) => `${p.row},${p.col}`))
+  const frontierSet = new Set(frontier.map((p) => `${p.row},${p.col}`))
+  const currentKey = current ? `${current.row},${current.col}` : null
 
   const getCellClass = (row, col) => {
     const cellKey = `${row},${col}`
@@ -29,19 +28,24 @@ function MazeGrid({ grid, start, goal, visited = [], path = [] }) {
     if (row === goal.row && col === goal.col) return 'cell-goal'
     if (grid[row][col] === 1) return 'cell-obstacle'
     if (pathSet.has(cellKey)) return 'cell-path'
+    if (cellKey === currentKey) return 'cell-current'
     if (visitedSet.has(cellKey)) return 'cell-visited'
+    if (frontierSet.has(cellKey)) return 'cell-frontier'
 
     return 'cell-empty'
   }
 
   return (
     <div className="maze-grid-container">
-      <div className="maze-grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      <div className={isEditing ? "maze-grid maze-grid-editing" : "maze-grid"} role="grid" aria-label="Maze grid" style={{ gridTemplateColumns: `repeat(${cols}, var(--cell-size))` }}>
         {grid.map((row, rowIdx) =>
           row.map((cell, colIdx) => (
-            <div key={`${rowIdx}-${colIdx}`} className={`maze-cell ${getCellClass(rowIdx, colIdx)}`}>
-              <div className="cell-inner" />
-            </div>
+            <button role="gridcell" type="button" key={`${rowIdx}-${colIdx}`} className={`maze-cell ${getCellClass(rowIdx, colIdx)}`}
+              aria-label={`Row ${rowIdx + 1}, column ${colIdx + 1}: ${rowIdx === start.row && colIdx === start.col ? 'Start' : rowIdx === goal.row && colIdx === goal.col ? 'Goal' : cell === 1 ? 'Wall' : 'Open'}`}
+              disabled={!isEditing || (rowIdx === start.row && colIdx === start.col) || (rowIdx === goal.row && colIdx === goal.col)}
+              onClick={() => onCellClick?.(rowIdx, colIdx)}>
+              <span className="cell-inner">{rowIdx === start.row && colIdx === start.col ? 'S' : rowIdx === goal.row && colIdx === goal.col ? 'G' : ''}</span>
+            </button>
           ))
         )}
       </div>
@@ -57,6 +61,14 @@ function MazeGrid({ grid, start, goal, visited = [], path = [] }) {
         <div className="legend-item">
           <div className="legend-color cell-obstacle"><div className="cell-inner" /></div>
           <span>Obstacle</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color cell-current"><div className="cell-inner" /></div>
+          <span>Current</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-color cell-frontier"><div className="cell-inner" /></div>
+          <span>Frontier</span>
         </div>
         <div className="legend-item">
           <div className="legend-color cell-visited"><div className="cell-inner" /></div>
