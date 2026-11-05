@@ -1,6 +1,13 @@
 import { ALGORITHMS, getAlgorithmName } from '../utils/searchContract.js'
 import './StatisticsComparison.css'
 
+// Same wording as Statistics: path length is the number of steps, not nodes.
+function formatPathLength(result) {
+  if (!result.found) return '—'
+  const steps = result.path.length - 1
+  return `${steps} ${steps === 1 ? 'step' : 'steps'}`
+}
+
 /**
  * Displays only results supplied by the application state.
  *
@@ -62,7 +69,7 @@ function StatisticsComparison({ results = [] }) {
                 <tr key={algorithm.id}>
                   <th scope="row">{algorithm.name}</th>
                   <td>{result.found ? 'Có' : 'Không'}</td>
-                  <td>{result.path.length}</td>
+                  <td>{formatPathLength(result)}</td>
                   <td>{result.pathCost ?? '—'}</td>
                   <td>{result.expandedNodes}</td>
                   <td>
