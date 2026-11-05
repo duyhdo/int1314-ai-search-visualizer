@@ -236,6 +236,27 @@ describe('maze-aware app state', () => {
     expect(unchangedState.mazeSize).toBe('10x10')
     expect(unchangedState.obstacleDensity).toBe(40)
   })
+  it('editing clears old results and rejects late callbacks while keeping generator settings', () => {
+    const state = selectedSearchState()
+    const pending = startSearch({
+      ...state,
+      comparisonResults: [{ algorithmId: 'greedy' }],
+    }, 'edit-request')
+    const editedMaze = structuredClone(state.maze)
+    editedMaze.grid[0][1] = 1 - editedMaze.grid[0][1]
+    const edited = appStateReducer(pending, { type: 'maze-edited', maze: editedMaze })
+    expect(edited.maze).toBe(editedMaze)
+    expect(edited.resultRecord).toBeNull()
+    expect(edited.comparisonResults).toEqual([])
+    expect(edited.activeSearch).toBeNull()
+    expect(edited.isRunning).toBe(false)
+    expect(edited.error).toBeNull()
+    expect(edited.mazeSize).toBe(state.mazeSize)
+    expect(edited.obstacleDensity).toBe(state.obstacleDensity)
+    expect(edited.selectedAlgorithm).toBe('greedy')
+    expect(finishSearch(edited, 'search-succeeded', 'edit-request', { maze: state.maze })).toBe(edited)
+  })
+
 })
 
 describe('error-dismissed', () => {

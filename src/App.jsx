@@ -1,5 +1,7 @@
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import MazeGrid from './components/MazeGrid'
+import MazeEditor from './components/MazeEditor'
+import { sampleMaze } from './data/sampleMaze'
 import ControlPanel from './components/ControlPanel'
 import Animation from './components/Animation'
 import MazeGenerator from './components/MazeGenerator'
@@ -23,6 +25,7 @@ function App() {
     undefined,
     createInitialAppState,
   )
+  const [isEditing, setIsEditing] = useState(false)
   const nextRequestIdRef = useRef(0)
   const activeRequestRef = useRef(null)
   const {
@@ -59,10 +62,10 @@ function App() {
     nextRequestIdRef.current = requestId
     const request = { requestId, maze, algorithmId: selectedAlgorithm }
     activeRequestRef.current = request
+    setIsEditing(false)
     dispatch({ type: 'search-started', ...request })
 
     try {
-      // Validate input
       const validation = validateInput(maze)
       if (!validation.valid) {
         throw new Error(`Invalid input: ${validation.error}`)
@@ -72,8 +75,6 @@ function App() {
       if (!searchFn) {
         throw new Error('Selected algorithm not found')
       }
-
-      // Execute search
       const startTime = performance.now()
       const searchOutput = searchFn(maze)
       const searchResult =
@@ -81,8 +82,6 @@ function App() {
           ? await searchOutput
           : searchOutput
       const measuredExecutionTimeMs = performance.now() - startTime
-
-      // Validate result
       if (!searchResult) {
         throw new Error('Algorithm returned no result')
       }
@@ -112,6 +111,7 @@ function App() {
     activeRequestRef.current = null
     try {
       const generatedMaze = generateMaze({ size, density })
+      setIsEditing(false)
       dispatch({
         type: 'maze-generated',
         maze: generatedMaze,
@@ -131,8 +131,29 @@ function App() {
     dispatch({ type: 'algorithm-selected', algorithmId })
   }
 
+  const handleCellClick = (row, col) => {
+    if (!isEditing || isRunning) return
+    if ((row === maze.start.row && col === maze.start.col) ||
+        (row === maze.goal.row && col === maze.goal.col)) return
+    activeRequestRef.current = null
+    const editedMaze = {
+      ...maze,
+      grid: maze.grid.map((cells, r) => r === row
+        ? cells.map((value, c) => c === col ? 1 - value : value)
+        : cells),
+    }
+    dispatch({ type: 'maze-edited', maze: editedMaze })
+  }
+
+  const handleRestore = () => {
+    activeRequestRef.current = null
+    setIsEditing(false)
+    dispatch({ type: 'maze-generated', maze: structuredClone(sampleMaze), size: '10x10', density: obstacleDensity })
+  }
+
   const handleReset = () => {
     activeRequestRef.current = null
+    setIsEditing(false)
     dispatch({ type: 'reset' })
   }
 
@@ -173,7 +194,11 @@ function App() {
         <div className="app-main">
           <div className="panel">
             <h2>Maze</h2>
+            <MazeEditor isEditing={isEditing} disabled={isRunning}
+              onEditToggle={() => setIsEditing(current => !current)} onRestore={handleRestore} />
             <MazeGrid
+              isEditing={isEditing && !isRunning}
+              onCellClick={handleCellClick}
               grid={maze.grid}
               start={maze.start}
               goal={maze.goal}
