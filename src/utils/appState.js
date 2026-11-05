@@ -28,6 +28,16 @@ function matchesActiveSearch(state, action) {
 
 export function appStateReducer(state, action) {
   switch (action.type) {
+    case 'maze-edited':
+      return {
+        ...state,
+        maze: action.maze,
+        resultRecord: null,
+        comparisonResults: [],
+        isRunning: false,
+        error: null,
+        activeSearch: null,
+      }
     case 'maze-generated':
       return {
         ...state,

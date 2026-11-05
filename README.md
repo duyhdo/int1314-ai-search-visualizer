@@ -105,6 +105,18 @@ npm run lint
 npm test
 ```
 
+### DFS + Maze Editor (feature/dfs-maze-ui)
+
+- Run `npm install` and `npm run dev`, then open the URL printed by Vite.
+- Select **Depth-First Search**, then **Run Search** to display the path and statistics.
+- Click **Edit Maze** and click a cell (or Tab + Enter/Space) to toggle a wall. Start (S) and Goal (G) are protected.
+- Editing a cell clears previous search results. Click **Done Editing** and run DFS again.
+- **Restore Sample Maze** restores the original maze. **Reset** clears search results and comparisons while keeping the current maze and algorithm.
+- DFS expands Up, Right, Down, Left and does not guarantee the shortest path.
+- Run DFS tests: `npm test -- --run src/tests/dfs.test.js`.
+
+Other algorithms and animation remain assigned to their respective feature branches.
+
 ## 5. Cấu trúc mã nguồn
 
 ```text
