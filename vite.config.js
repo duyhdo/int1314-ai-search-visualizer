@@ -3,5 +3,5 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/int1314-ai-search-visualizer/",
+  base: "/",
 });
