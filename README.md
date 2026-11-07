@@ -10,10 +10,10 @@
 ### Danh sách thành viên
 
 1. K24DTCN486 - Đỗ Hoàng Duy - dohoangduy.vig@gmail.com - duyhdo
-2. 
-3. 
-4. 
-5. 
+2. K24DTCN488 - Thái Đình Hùng - thaidinhhunghs12101992@gmail.com - thaidinhhunghs12101992-alt
+3. K24DTCN489 - Trương Khang Hy - hykhang101@gmail.com - hykhang101-boop
+4. K24DTCN553 - Tạ Hùng Cường - thcuong076@gmail.com - thcuong7696
+5. K24DTCN408 - Trương Văn Thắng - trthang.29@gmail.com - thangqazk2
 
 ---
 
